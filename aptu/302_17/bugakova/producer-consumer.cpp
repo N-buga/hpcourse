@@ -94,7 +94,7 @@ void* consumer_interruptor_routine(void* arg) {
   // wait for consumer to start
  	wait_for_start();
   // interrupt consumer while producer is running 
-	pthread_t cons = (pthread_t) arg;
+	pthread_t cons = *((pthread_t*) arg);
   while (state != State::TERMINATED) {
   	int rc = pthread_cancel(cons);
  	if (rc == 0) {
@@ -111,7 +111,7 @@ int run_threads() {
 	Value * value = new Value();
 
 	iter_prod = pthread_create(&prod, NULL, producer_routine, (void*)value);
-	iter_inter = pthread_create(&inter, NULL, consumer_interruptor_routine, (void*)cons);
+	iter_inter = pthread_create(&inter, NULL, consumer_interruptor_routine, (void*)&cons);
 	iret_cons = pthread_create(&cons, NULL, consumer_routine, (void*)value);
 
   // start 3 threads and wait until they're done
